@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "portfolio-city-animation/index.html",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "portfolio-city-animation/index.html"
+      "dest": "/$1"
     }
   ],
   "headers": [

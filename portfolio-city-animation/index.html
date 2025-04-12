@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yuvraj Sharma </title>
   <!-- Import Three.js and GSAP from CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.151.3/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <!-- Import modern fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,8 +70,11 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      z-index: 0;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      background-color: #001F2E;
+      overflow: hidden;
     }
     
     /* Content overlay for portfolio sections */
@@ -554,6 +557,18 @@
       .interest-icon {
         width: 45%;
       }
+      
+      .intro-card {
+        padding: 2rem;
+      }
+      
+      .intro-card h1 {
+        font-size: 2.5rem;
+      }
+      
+      .intro-card .subtitle {
+        font-size: 1.2rem;
+      }
     }
     
     @media (max-width: 480px) {
@@ -576,6 +591,10 @@
       
       .interest-icon {
         width: 100%;
+      }
+      
+      #canvas-container {
+        opacity: 0.6; /* Reduce opacity on mobile for better text readability */
       }
     }
 
@@ -812,15 +831,15 @@
         <h2>About Me</h2>
         <div class="about-content">
           <p>
-          I found my euphoria not in some big revelation driven by curiosity shaped by practicality. I enjoy being in my own world, eyes closed, building ideas in silence. A pandit once said it’s written in the stars — maybe. That imagination led me to XR, then game development, and now I’m all about exploring tech, learning hands-on, and building what I wish existed.
+          I found my euphoria not in some big revelation driven by curiosity shaped by practicality. I enjoy being in my own world, eyes closed, building ideas in silence. A pandit once said it's written in the stars — maybe. That imagination led me to XR, then game development, and now I'm all about exploring tech, learning hands-on, and building what I wish existed.
           </p>
           
           <p>
-            Outside of code and design, I’m usually diving into VR spaces, working on hackathon ideas, lifting (for balance), or binging building breakdowns on YouTube like it’s research. 
+            Outside of code and design, I'm usually diving into VR spaces, working on hackathon ideas, lifting (for balance), or binging building breakdowns on YouTube like it's research. 
           </p>
           
           <p>
-            Always open to collaborate. I believe in taking the best, leaving the rest, and building something that makes a dent (I m dramatic like that(i got kicked out of NSD in 9th)). If our paths cross, let’s team up and leave the world better — even if it’s in the last second.
+            Always open to collaborate. I believe in taking the best, leaving the rest, and building something that makes a dent (I m dramatic like that(i got kicked out of NSD in 9th)). If our paths cross, let's team up and leave the world better — even if it's in the last second.
           </p>
           
           <div class="interest-icons">
@@ -1025,130 +1044,122 @@
         <h2 class="section-title">Research & Blogs</h2>
         <div class="research-grid">
           <div class="research-card">
-<section id="research">
-  <div class="container">
-    <h2>Research & Writing</h2>
-    <div class="research-grid">
+            <h3>MBTI Test for Paint: Mapping Personality Through Color</h3>
+            <p class="research-date">2023</p>
+            <p class="research-description">Explores how MBTI personality traits can influence color selection in spatial design. This experimental study merges psychology with visual expression to inspire more intuitive user-centered environments.</p>
+            <a href="#" class="research-link">Read More</a>
+          </div>
 
-      
-            <div class="research-card">
-              <h3>MBTI Test for Paint: Mapping Personality Through Color</h3>
-              <p class="research-date">2023</p>
-              <p class="research-description">Explores how MBTI personality traits can influence color selection in spatial design. This experimental study merges psychology with visual expression to inspire more intuitive user-centered environments.</p>
-              <a href="#" class="research-link">Read More</a>
-            </div>
-      
-            <div class="research-card">
-              <h3>Bridging the Physical and Virtual: AR in Architectural Education</h3>
-              <p class="research-date">2023</p>
-              <p class="research-description">A research paper discussing the integration of augmented reality in design studios, highlighting its potential to revolutionize spatial understanding and collaborative critique in architecture schools.</p>
-              <a href="#" class="research-link">Read More</a>
-            </div>
-      
-            <div class="research-card">
-              <h3>Decentralized Futures: Web3 and the Built Environment</h3>
-              <p class="research-date">2024</p>
-              <p class="research-description">A blog post diving into how blockchain and Web3 could reshape architectural practice—think decentralized planning, tokenized design assets, and open-source urbanism.</p>
-              <a href="#" class="research-link">Read More</a>
-            </div>
+          <div class="research-card">
+            <h3>Bridging the Physical and Virtual: AR in Architectural Education</h3>
+            <p class="research-date">2023</p>
+            <p class="research-description">A research paper discussing the integration of augmented reality in design studios, highlighting its potential to revolutionize spatial understanding and collaborative critique in architecture schools.</p>
+            <a href="#" class="research-link">Read More</a>
+          </div>
 
-            <div class="research-card">
-              <h3>Text-to-Music Conversion Models</h3>
-              <p class="research-date">2025</p>
-              <p class="research-description"> The research aims to explore AI’s role in music generation based on natural language processing and sound recognition.</p>
-              <a href="#" class="research-link">Read More</a>
-            </div>
+          <div class="research-card">
+            <h3>Decentralized Futures: Web3 and the Built Environment</h3>
+            <p class="research-date">2024</p>
+            <p class="research-description">A blog post diving into how blockchain and Web3 could reshape architectural practice—think decentralized planning, tokenized design assets, and open-source urbanism.</p>
+            <a href="#" class="research-link">Read More</a>
+          </div>
 
-            <div class="research-card">
-              <h3>Blog: ARCHIE: An Expert System of the Architects</h3>
-              <p class="research-date">2025</p>
-              <a href="#" class="research-link">Read More</a>
-            </div>
-      
+          <div class="research-card">
+            <h3>Text-to-Music Conversion Models</h3>
+            <p class="research-date">2025</p>
+            <p class="research-description"> The research aims to explore AI's role in music generation based on natural language processing and sound recognition.</p>
+            <a href="#" class="research-link">Read More</a>
+          </div>
+
+          <div class="research-card">
+            <h3>Blog: ARCHIE: An Expert System of the Architects</h3>
+            <p class="research-date">2025</p>
+            <a href="#" class="research-link">Read More</a>
           </div>
         </div>
-      </section>
-      
-
+      </div>
+    </section>
   </div>
-  <script src="main.js"></script>
-<script>
-  // Smooth scrolling and section highlighting
-  document.addEventListener('DOMContentLoaded', function() {
-    const sections = document.querySelectorAll('.section');
-    const navLinks = document.querySelectorAll('.nav-menu a');
-    
-    // Function to update active nav link
-    function updateActiveNav() {
-      let current = '';
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="three-animation.js"></script>
+  <script>
+    // Smooth scrolling and section highlighting
+    document.addEventListener('DOMContentLoaded', function() {
+      const sections = document.querySelectorAll('.section');
+      const navLinks = document.querySelectorAll('.nav-menu a');
       
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (window.pageYOffset >= sectionTop - sectionHeight/3) {
-          current = section.getAttribute('id');
-        }
-      });
-      
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').substring(1) === current) {
-          link.classList.add('active');
-        }
-      });
-    }
-    
-    // Smooth scroll for nav links
-    navLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href').substring(1);
-        const targetSection = document.getElementById(targetId);
+      // Function to update active nav link
+      function updateActiveNav() {
+        let current = '';
         
-        window.scrollTo({
-          top: targetSection.offsetTop,
-          behavior: 'smooth'
-        });
-      });
-    });
-    
-    // Update active nav on scroll
-    window.addEventListener('scroll', updateActiveNav);
-    
-    // Loading screen animation
-    window.addEventListener('load', function() {
-      setTimeout(() => {
-        gsap.to("#loading-screen", {
-          opacity: 0,
-          duration: 1.5,
-          onComplete: function() {
-            document.getElementById('loading-screen').style.display = 'none';
-            
-            // Intro animations
-            gsap.from(".intro-card", {
-              opacity: 0,
-              y: 50,
-              duration: 1.5,
-              ease: "power2.out"
-            });
-            
-            // Animate tech stack items
-            document.querySelectorAll('.tech-item').forEach(item => {
-              gsap.from(item, {
-                opacity: 0,
-                y: 20,
-                scale: 0.8,
-                duration: 0.5,
-                delay: parseInt(item.dataset.delay) / 1000,
-                ease: "back.out(1.7)"
-              });
-            });
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.clientHeight;
+          if (window.pageYOffset >= sectionTop - sectionHeight/3) {
+            current = section.getAttribute('id');
           }
         });
-      }, 1500);
+        
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href').substring(1) === current) {
+            link.classList.add('active');
+          }
+        });
+      }
+      
+      // Smooth scroll for nav links
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href').substring(1);
+          const targetSection = document.getElementById(targetId);
+          
+          window.scrollTo({
+            top: targetSection.offsetTop,
+            behavior: 'smooth'
+          });
+        });
+      });
+      
+      // Update active nav on scroll
+      window.addEventListener('scroll', updateActiveNav);
+      
+      // Loading screen animation
+      window.addEventListener('load', function() {
+        setTimeout(() => {
+          gsap.to("#loading-screen", {
+            opacity: 0,
+            duration: 1.5,
+            onComplete: function() {
+              document.getElementById('loading-screen').style.display = 'none';
+              
+              // Intro animations
+              gsap.from(".intro-card", {
+                opacity: 0,
+                y: 50,
+                duration: 1.5,
+                ease: "power2.out"
+              });
+              
+              // Animate tech stack items
+              document.querySelectorAll('.tech-item').forEach(item => {
+                gsap.from(item, {
+                  opacity: 0,
+                  y: 20,
+                  scale: 0.8,
+                  duration: 0.5,
+                  delay: parseInt(item.dataset.delay) / 1000,
+                  ease: "back.out(1.7)"
+                });
+              });
+            }
+          });
+        }, 1500);
+      });
     });
-  });
-</script>
+  </script>
 </body>
 </html>
 

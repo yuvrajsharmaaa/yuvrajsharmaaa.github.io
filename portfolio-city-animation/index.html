@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yuvraj Sharma </title>
+  <!-- Import Three.js and GSAP from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.151.3/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <!-- Import modern fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      color: white;
+      overflow-x: hidden;
+      background-color: #001F2E;
+    }
+    
+    /* Loading screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #001F2E;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(255, 255, 255, 0.1);
+      border-top: 5px solid #00FFFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    .loading-text {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      color: #00FFFF;
+      opacity: 0.8;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Canvas container for Three.js */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    
+    /* Content overlay for portfolio sections */
+    .content-overlay {
+      position: relative;
+      width: 100%;
+      z-index: 10;
+    }
+    
+    /* Navigation menu */
+    .nav-menu {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      pointer-events: auto;
+    }
+    
+    .nav-menu ul {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(10px);
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .nav-menu a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      font-family: 'Sora', sans-serif;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+    
+    .nav-menu a:hover {
+      color: #fff;
+      background-color: rgba(0, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .nav-menu a.active {
+      color: #00FFFF;
+      background-color: rgba(0, 255, 255, 0.1);
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+    
+    /* Section styling - now for continuous scrolling */
+    .section {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 6rem 2rem 4rem 2rem;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .content-container {
+      max-width: 1000px;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 2.5rem;
+      pointer-events: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform: translateZ(0);
+    }
+    
+    .intro-card {
+      background: rgba(0, 10, 20, 0.9);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 3rem;
+      max-width: 800px;
+      margin: 0 auto;
+      backdrop-filter: blur(10px);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 255, 255, 0.1);
+      transform: translateY(0);
+      transition: all 0.3s ease;
+    }
+    
+    .intro-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(0, 255, 255, 0.2);
+    }
+    
+    .intro-card h1 {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #00FFFF, #7FCFFF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    
+    .intro-card .subtitle {
+      font-size: 1.8rem;
+      color: #7FCFFF;
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+    
+    .intro-card p {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* Typography */
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 48px;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #7FCFFF, #00FFFF);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 2rem;
+      margin: 2rem 0 1rem;
+      color: #00FFFF;
+    }
+    
+    h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.5rem;
+      margin: 1.5rem 0 0.75rem;
+      color: #7FCFFF;
+    }
+    
+    h4 {
+      font-size: 1.2rem;
+      margin: 1rem 0 0.5rem;
+      color: #BBDEFB;
+    }
+    
+    p {
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+      font-size: 1.05rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .subtitle {
+      font-family: 'Inter', sans-serif;
+      font-size: 24px;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      font-weight: 400;
+      color: #fff;
+    }
+    
+    /* Tech stack styling */
+    .tech-stack {
+      margin: 2.5rem 0;
+      opacity: 1;
+    }
+    
+    .stack-category {
+      margin-bottom: 1.5rem;
+      background: rgba(0, 31, 46, 0.4);
+      padding: 1.2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    
+    .tech-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    
+    .tech-item {
+      background: rgba(0, 255, 255, 0.15);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 
+        inset 2px 2px 5px rgba(0, 255, 255, 0.1),
+        inset -2px -2px 5px rgba(0, 0, 0, 0.3),
+        4px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tech-item:hover {
+      transform: translateY(-3px);
+      background: rgba(0, 255, 255, 0.25);
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+      color: #fff;
+    }
+    
+    /* Projects styling */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.8rem;
+      margin-top: 1.5rem;
+    }
+    
+    .project-card {
+      background: linear-gradient(135deg, rgba(0, 31, 46, 0.6) 0%, rgba(0, 0, 20, 0.7) 100%);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 1.8rem;
+      transition: all 0.4s ease;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #7FCFFF, #00FFFF);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      background: linear-gradient(135deg, rgba(0, 31, 46, 0.8) 0%, rgba(0, 0, 20, 0.9) 100%);
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.15);
+    }
+    
+    .project-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .project-card h3 {
+      margin-top: 0;
+    }
+    
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .project-tech span {
+      font-size: 0.8rem;
+      background-color: rgba(0, 255, 255, 0.08);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 255, 0.1);
+    }
+    
+    /* About styling */
+    .about-content {
+      max-width: 90%;
+    }
+    
+    .interest-icons {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+    
+    .interest-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .interest-icon:hover {
+      transform: translateY(-5px);
+    }
+    
+    .interest-icon svg {
+      filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.3));
+    }
+    
+    .interest-icon span {
+      color: #7FCFFF;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    /* Contact styling */
+    .contact-info {
+      margin-top: 2rem;
+      background: rgba(0, 31, 46, 0.4);
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 255, 255, 0.1);
+    }
+    
+    .contact-item {
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .contact-label {
+      min-width: 100px;
+      color: #7FCFFF;
+      font-weight: 500;
+      font-family: 'Sora', sans-serif;
+    }
+    
+    .contact-item a {
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      padding-bottom: 2px;
+    }
+    
+    .contact-item a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: #00FFFF;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.3s ease;
+    }
+    
+    .contact-item a:hover {
+      color: #00FFFF;
+    }
+    
+    .contact-item a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+    
+    .resume-download {
+      margin-top: 2.5rem;
+      text-align: center;
+    }
+    
+    .btn-download {
+      display: inline-block;
+      background: linear-gradient(135deg, #001F2E 0%, #003046 100%);
+      color: #00FFFF;
+      font-family: 'Sora', sans-serif;
+      font-weight: 500;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 255, 255, 0.5);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-download::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 127, 255, 0.2) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .btn-download:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 255, 255, 0.2);
+    }
+    
+    .btn-download:hover::before {
+      opacity: 1;
+    }
+    
+    /* Modified scroll indicator for page sections */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      animation: bounce 2s infinite;
+      color: #00FFFF;
+      font-size: 2rem;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) translateX(-50%);
+      }
+      40% {
+        transform: translateY(-20px) translateX(-50%);
+      }
+      60% {
+        transform: translateY(-10px) translateX(-50%);
+      }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 38px;
+      }
+      
+      .subtitle {
+        font-size: 20px;
+      }
+      
+      .nav-menu {
+        padding: 1.2rem;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      
+      .nav-menu ul {
+        padding: 0.6rem 1rem;
+        gap: 0.5rem;
+      }
+      
+      .nav-menu a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+      
+      .project-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .content-container {
+        padding: 1.8rem;
+      }
+      
+      .interest-icons {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      
+      .interest-icon {
+        width: 45%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 32px;
+      }
+      
+      .subtitle {
+        font-size: 18px;
+      }
+      
+      .content-container {
+        padding: 1.5rem;
+      }
+      
+      .tech-item {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+      
+      .interest-icon {
+        width: 100%;
+      }
+    }
+
+    /* Add new styles for skills grid */
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .skill-item {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .skill-item:hover {
+      transform: translateY(-2px);
+      background: rgba(30, 41, 59, 0.7);
+      border-color: rgba(0, 255, 255, 0.4);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .skyscraper-container {
+      width: 100%;
+      min-height: 600px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1000px;
+    }
+
+    .skyscraper {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transform: rotateX(10deg);
+    }
+
+    .floor {
+      background: rgba(0, 10, 20, 0.9);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 2rem;
+      transform-origin: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .floor:hover {
+      transform: translateX(20px);
+      background: rgba(0, 20, 40, 0.95);
+      border-color: rgba(0, 255, 255, 0.4);
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        0 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .floor-content {
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.3s ease;
+    }
+
+    .floor:hover .floor-content {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .floor h3 {
+      color: #00FFFF;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .floor .company {
+      color: #7FCFFF;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+
+    .floor .date {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .floor .description {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .skyscraper {
+        transform: none;
+      }
+
+      .floor {
+        padding: 1.5rem;
+      }
+
+      .floor:hover {
+        transform: translateX(10px);
+      }
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .cta-button {
+      padding: 0.8rem 1.5rem;
+      background: rgba(127, 207, 255, 0.1);
+      border: 1px solid rgba(127, 207, 255, 0.3);
+      border-radius: 4px;
+      color: #7FCFFF;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .cta-button:hover {
+      background: rgba(127, 207, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .research-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .research-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(127, 207, 255, 0.1);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .research-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(127, 207, 255, 0.3);
+    }
+
+    .research-date {
+      color: #7FCFFF;
+      font-size: 0.9rem;
+      margin: 0.5rem 0;
+    }
+
+    .research-description {
+      color: #ccc;
+      margin: 1rem 0;
+    }
+
+    .research-link {
+      color: #7FCFFF;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .research-link:hover {
+      color: #fff;
+      transform: translateX(5px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading screen -->
+  <div id="loading-screen">
+    <div class="loader"></div>
+    <div class="loading-text">Hold tight...
+       this website is thinking</div>
+  </div>
+
+  <!-- Three.js Canvas Container -->
+  <div id="canvas-container"></div>
+  
+  <!-- Portfolio Content Overlay -->
+  <div class="content-overlay">
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section">
+      <div class="content-container intro-card">
+        <h1>Yuvraj</h1>
+        <p class="subtitle">Creative Technologist</p>
+        <p>
+          Namaste, I'm Yuvraj, better known as Bacardi Sharma — a guy on a mission to build smarter spaces and systems. From homes that talk to you, to decentralized platforms redefining how we interact with the built world and generating solutions that bridge the digital and physical spaces — Trying to solve real-world problems with tech that actually matters.
+        </p>
+        
+      
+        <div class="cta-buttons">
+          <a href="#contact" class="cta-button">Get in Touch</a>
+          <a href="path/to/your/resume.pdf" class="cta-button" download>Download Resume</a>
+        </div>
+      </div>
+      <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+      <div class="content-container">
+        <h2>About Me</h2>
+        <div class="about-content">
+          <p>
+          I found my euphoria not in some big revelation driven by curiosity shaped by practicality. I enjoy being in my own world, eyes closed, building ideas in silence. A pandit once said it’s written in the stars — maybe. That imagination led me to XR, then game development, and now I’m all about exploring tech, learning hands-on, and building what I wish existed.
+          </p>
+          
+          <p>
+            Outside of code and design, I’m usually diving into VR spaces, working on hackathon ideas, lifting (for balance), or binging building breakdowns on YouTube like it’s research. 
+          </p>
+          
+          <p>
+            Always open to collaborate. I believe in taking the best, leaving the rest, and building something that makes a dent (I m dramatic like that(i got kicked out of NSD in 9th)). If our paths cross, let’s team up and leave the world better — even if it’s in the last second.
+          </p>
+          
+          <div class="interest-icons">
+            <div class="interest-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="48" height="48">
+                <g fill="#7FCFFF">
+                  <path fill-rule="evenodd" d="M4 3h8a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3h-.394a3 3 0 0 1-1.665-.504l-.832-.555a2 2 0 0 0-2.218 0l-.832.555A3 3 0 0 1 4.394 13H4a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3m0 1a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h.394a2 2 0 0 0 1.11-.336l.832-.555a3 3 0 0 1 3.328 0l.832.555a2 2 0 0 0 1.11.336H12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" clip-rule="evenodd"/>
+                  <path d="M0 7h1v3H0zm15 0h1v3h-1zM6.5 8a.5.5 0 0 1 0 1H4a.5.5 0 0 1 0-1zM12 8a.5.5 0 0 1 0 1H9.5a.5.5 0 0 1 0-1z"/>
+                </g>
+              </svg>
+              <span>XR</span>
+            </div>
+            <div class="interest-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="48" height="48">
+                <path fill="#7FCFFF" d="M225.216 45.721c.282 29.004-17.025 11.218-16.789 27.509c.108 7.445 9.294 14.086 14.265 23.703c5.905 11.425 7.62 26.08 5.72 37.667c-1.236 7.537-3.74 15.124-7.096 22.056c-9.116 18.834-23.643 29.155-46.82 27.318c-22.024-1.746-44.21-1.562-66.301-2.652c-7.963-.393-31.364-8.237-32.065-3.406c-1.038 7.16 3.037 12.194 9.308 14.128c11.005 3.393 22.341 6.715 33.77 7.754c21.998 1.998 44.252 1.536 66.211 3.779c11.622 1.187 23.564 4.5 34.089 9.363c17.358 8.02 21.889 22.065 20.144 43.863c-1.68 20.992-11.962 35.382-30.884 45.061c-4.228 2.163-8.25 4.744-12.157 7.414c-6.623 4.525-6.144 9.809 1.093 13.108c4.213 1.92 8.555 3.582 12.786 5.469c19.603 8.743 32.486 33.682 27.568 53.287c-2.46 9.804-15.02 14.079-23.217 7.982c-12.534-9.324-26.085-16.585-42.266-18.165c-13.226-1.29-24.477 2.64-33.043 12.416c-1.687 1.925-3.178 5.723-2.281 7.547c1.047 2.129 4.68 3.92 7.424 4.292c5.266.712 10.701.49 16.058.354c33.993-.863 55.85 14.001 67.39 44.68c13.587 36.116-15.68 64.49-45.833 70.406c-20.865 4.093-38.681-3.048-55.023-14.59c-15.346-10.84-27.918-24.257-39.653-39.614c11.236.492 21.642.417 31.909 1.525c13.88 1.498 27.669 3.82 41.46 5.998c2.649.418 5.235 1.61 7.667 2.79c6.809 3.301 6.881 7.242.94 11.945c-3.426 1.183-7.909 4.092-5.054 7.072c3.031 2.89 5.318 3.153 8.212 3.935c2.412.652 5.224.416 7.776.049c7.426-1.07 14.512-3.204 17.614-10.547c3.133-7.42-.735-13.53-5.337-19.157c-12.263-14.996-29.739-18.849-48.26-20.212c-26.15-1.924-52.329-3.5-78.452-5.695c-5.902-.496-11.843-2.417-17.39-4.566c-14.15-5.484-19.33-17.808-13.947-31.36c8.792 2.382 17.415 5.532 26.34 6.968c19.504 3.137 37.509-.735 52.773-13.32c7.601-6.268 11.745-14.117 10.066-24.07c-.917-5.436-4.26-7.114-8.929-3.932c-4.683 3.191-9.135 6.75-13.358 10.488c-11.705 10.357-25.322 13.205-40.53 9.625c-16.2-3.814-30.772-10.335-39.219-25.05c-9.228-16.079-3.347-38.098 13.8-52.885c3.525-3.04 7.51-5.595 10.34-7.68c6.727 4.876 12.522 9.398 18.676 13.42c3.837 2.509 7.967 2.43 10.585-1.968c2.643-4.44 2-8.415-2.255-11.911c-3.928-3.227-8.192-6.358-11.165-10.313c-7.96-10.588-6.085-24.717 3.942-33.555c1.09-.96 2.816-1.778 4.253-1.787c16.894-.107 33.798-.327 50.681.112c6.357.166 12.943 1.193 18.943 3.164c14.692 4.827 22.933 17.838 20.682 31.203c-2.063 12.256-14.104 21.44-29.256 22.243c-2.742.145-5.554-.28-8.23.15c-6.49.204-5.245 6.775-4.099 8.103c10.564 12.245 27.196 15.307 41.633 7.932c34.074-17.406 36.69-61.704 4.877-82.267c-11.795-7.624-24.939-11.847-38.99-12.525c-17.139-.826-34.36-.13-51.492-1.022c-16.584-.864-31.42-6.538-42.588-18.846c-8.657-9.54-10.496-20.51-5.904-32.375c8.824-22.799 31.785-34.598 59.108-29.583c18.452 3.386 36.554 8.637 55.077 11.493c11.62 1.791 23.888 1.943 35.586.602c18.85-2.16 30.078-13.545 34.134-31.17c4.09-17.769-.654-32.797-16.039-44.09c-12.683-9.31-27.533-13.403-43.111-15.433c-16.957-2.21-33.728-1.482-50.155 3.438c-9.342 3.375-10.326 9.235-9.777 12.152c.364 1.939 5.203 4.335 8.097 4.408c13.716.346 27.489-.688 41.17.016c14.536.749 29.165 2.29 40.599 12.725c8.323 7.597 11.706 17.233 8.471 25.03c-3.527 8.501-12.705 13.966-24.457 13.337c-8.456-.452-16.91-1.868-25.235-3.471c-17.76-3.42-35.37-7.575-53.175-10.74c-7.602-1.35-15.542-.976-23.555-1.397c-8.06-20.043-12.813-32.099 8.13-50.727c19.367-17.228 42.306-29.254 69.833-28.603c9.465.225 18.804 4.185 28.26 6.181c7.949 1.678 15.967 3.077 23.995 4.364c1.464.234 8.223 1.606 6.4-1.453c-2.886-4.215-4.737-8.375-7.877-11.252c-14.257-13.061-31.875-18.53-51.276-19.472c-2.607-.127-5.224-.05-7.836-.09c-.247-.003-.491-.158-1.453-.49c7.043-10.624 15.76-19.168 28.638-22.167c17.116-3.987 33.448-.82 48.082 8.337c14.755 9.233 17.071 16.852 17.254 35.647M31.12 235.511c-3.955-2.202-6.433-1.932-9.69.66C4.341 249.766-.678 267.89.07 288.065c.265 7.137 2.524 13.718 8.977 18.027c5.525-4.493 10.396-9.183 16.015-12.82c5.722-3.707 12.18-6.378 18.557-9.626c-2.656-13.914 1.549-26.6 9.419-38.205c-7.591-3.365-15.076-6.122-21.919-9.93M288.188 47c.462-17.296 2.254-25.108 8.93-31.853c21.978-22.205 60.765-19.606 78.9 5.235c.757 1.035 1.4 2.148 2.369 3.647c-26.857.963-51.442 5.596-66.303 29.51l.701 2.772c5.193 0 10.488.623 15.549-.174c5.102-.805 10.131-2.659 14.914-4.68c19.204-8.116 38.334-7.302 57.176.63c14.99 6.31 29.263 13.956 40.443 26.005c10.036 10.816 13.521 22.997 8.008 37.065c-1.38 3.522-2.376 7.188-3.56 10.82c-30.608-2.175-58.5 10.117-87.822 13.929c-6.587.856-13.49 1.295-20.01.356c-14.461-2.082-21.44-16.494-14.463-29.03c7.062-12.69 19.025-18.627 33.028-19.65c17.374-1.269 34.858-1.178 52.297-1.492c4.18-.076 8.5.416 9.648-4.754c1.12-5.045-.986-8.949-6.072-10.551c-31.771-10.012-62.72-8.562-91.701 8.364c-17.737 10.358-23.91 27.58-18.919 47.356c4.777 18.926 17.422 29.122 38.598 31.113c22.458 2.112 43.751-3.775 65.076-9.2c14.006-3.562 27.97-6.636 42.532-3.542c22.114 4.699 39.073 27.11 35.243 46.869c-2.215 11.426-9.878 19.039-19.643 24.752c-11.846 6.931-24.814 9.424-38.624 9.182c-19.733-.346-39.593-1.697-58.944 3.827c-12.133 3.463-22.87 9.392-31.476 18.415c-18.124 19.002-13.53 51.547 9.527 69.258c15.034 11.548 32.373 10.664 45.717-2.685c1.633-1.634 2.344-4.824 2.141-7.182c-.078-.91-3.843-1.88-6.02-2.179c-4.508-.619-9.193-.3-13.598-1.267c-12.975-2.847-20.898-11.54-22.336-23.785c-1.213-10.336 5.992-21.782 17.141-27.219c10.805-5.27 22.425-4.657 34.001-4.569c11.962.09 23.928-.146 35.886.071c2.262.041 5.07.956 6.652 2.45c10.887 10.28 10.457 26.83-.82 37.623c-2.195 2.1-4.82 3.771-7.214 5.678c-4.129 3.287-4.458 7.42-2.048 11.631c2.47 4.318 6.515 4.63 10.354 2.054c6.02-4.041 11.724-8.531 18.038-13.181c15.006 6.264 28.457 26.99 28.055 44.44c-.393 17.117-12.155 30.695-33.208 38.322c-19.309 6.995-36.906 5.503-51.996-9.61c-3.07-3.075-6.71-5.688-10.38-8.088c-4.098-2.679-7.132-1.665-8.222 3.338c-2.482 11.387 2.811 19.83 11.472 26.317c21.37 16.006 44.676 15.815 68.772 6.814c2.118-.791 4.176-1.734 6.238-2.597c6.064 10.84 1.9 26.035-10.224 30.382c-12.303 4.41-25.567 7.083-38.638 8.464c-23.369 2.47-46.948 2.985-70.36 5.13c-12.91 1.183-24.34 6.607-33.026 16.431c-5.667 6.41-10.798 13.291-6.576 22.347c3.2 6.865 14.233 11.079 24.393 9.382c2.842-.475 5.4-2.574 8.087-3.928c-1.656-2.389-2.865-5.31-5.056-7.064c-5.93-4.75-6.026-9.709 1.313-11.95c11.205-3.421 22.799-6.133 34.432-7.584c14.447-1.803 29.104-2.014 45.7-3.038c-8.476 9.409-15.407 17.886-23.175 25.556c-14.155 13.976-29.874 25.625-50.428 29.43c-35.998 6.665-72.605-25.324-68.038-59.613c4.493-33.735 32.327-56.96 67.042-56.027c5.78.156 11.63.442 17.33-.254c2.771-.338 6.322-2.255 7.545-4.486c.907-1.657-.668-5.562-2.34-7.453c-11.112-12.575-25.712-15.733-41.001-10.516c-11.591 3.955-22.422 10.446-32.944 16.824c-7.687 4.66-19.611 1.34-22.142-7.39c-5.345-18.433 6.159-43.734 24.29-53.06c4.748-2.442 9.789-4.335 14.651-6.572c7.2-3.312 7.777-8.919 1.197-13.4c-5.178-3.527-10.425-7.059-16.01-9.9c-28.32-14.411-29.2-48.514-23.344-68.702c3.017-10.4 11.967-15.936 21.444-20.127c18.498-8.178 38.43-7.758 58.155-8.972c19.532-1.2 39.04-3.111 58.456-5.503c5.036-.621 10.05-3.699 14.374-6.63c2.44-1.655 4.45-5.198 4.802-8.103c.308-2.54-1.275-6.503-3.338-7.725c-1.598-.947-5.215 1.406-7.956 2.223c-6.424 1.915-12.775 5.017-19.308 5.449c-20.521 1.357-41.12 1.531-61.674 2.482c-31.633 1.463-49.686-12.389-55.69-44.64c-1.914-10.275-1.653-21.12-.96-31.616c.612-9.268 5.72-16.795 14.214-21.74c2.535-1.475 5.178-2.968 7.232-4.978c1.845-1.804 6.117-7.873-1.976-11.471c0 0-14.941-4.917-14.48-22.213m215.174 258.317c17.76-12.995 6.263-61.266-17.494-71.676l-26.53 11.807c8.215 11.62 11.688 24.61 9.583 36.835z"/>
+              </svg>
+              <span>AI/ML</span>
+            </div>
+            <div class="interest-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="48" height="48">
+                <g fill="#7FCFFF">
+                  <path fill-rule="evenodd" d="M4 3h8a4 4 0 0 1 4 4v3a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4m0 1a3 3 0 0 0-3 3v3a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3z" clip-rule="evenodd"/>
+                  <path d="M5.5 6a.5.5 0 0 0-.5.5V8H3.5a.5.5 0 0 0 0 1H5v1.5a.5.5 0 0 0 1 0V9h1.5a.5.5 0 0 0 0-1H6V6.5a.5.5 0 0 0-.5-.5M13 7a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-1 3a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/>
+                </g>
+              </svg>
+              <span>Game Dev</span>
+            </div>
+            <div class="interest-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="48" height="48">
+                <path fill="#7FCFFF" fill-rule="evenodd" d="M16 32C7.163 32 0 24.837 0 16S7.163 0 16 0s16 7.163 16 16s-7.163 16-16 16m7.189-17.98c.314-2.096-1.283-3.223-3.465-3.975l.708-2.84l-1.728-.43l-.69 2.765c-.454-.114-.92-.22-1.385-.326l.695-2.783L15.596 6l-.708 2.839q-.565-.127-1.104-.26l.002-.009l-2.384-.595l-.46 1.846s1.283.294 1.256.312c.7.175.826.638.805 1.006l-.806 3.235q.073.017.18.057l-.183-.045l-1.13 4.532c-.086.212-.303.531-.793.41c.018.025-1.256-.313-1.256-.313l-.858 1.978l2.25.561c.418.105.828.215 1.231.318l-.715 2.872l1.727.43l.708-2.84q.707.19 1.378.357l-.706 2.828l1.728.43l.715-2.866c2.948.558 5.164.333 6.097-2.333c.752-2.146-.037-3.385-1.588-4.192c1.13-.26 1.98-1.003 2.207-2.538m-3.95 5.538c-.533 2.147-4.148.986-5.32.695l.95-3.805c1.172.293 4.929.872 4.37 3.11m.535-5.569c-.487 1.953-3.495.96-4.47.717l.86-3.45c.975.243 4.118.696 3.61 2.733"/>
+              </svg>
+              <span>Web3</span>
+            </div>
+            <div class="interest-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="48" height="48">
+                <path fill="#7FCFFF" fill-rule="evenodd" d="m8.36 1.37l6.36 5.8l-.71.71L13 6.964v6.526l-.5.5h-3l-.5-.5v-3.5H7v3.5l-.5.5h-3l-.5-.5V6.972L2 7.88l-.71-.71l6.35-5.8zM4 6.063v6.927h2v-3.5l.5-.5h3l.5.5v3.5h2V6.057L8 2.43z" clip-rule="evenodd"/>
+              </svg>
+              <span>Architecture</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+      <div class="content-container">
+        <h2>My Skills</h2>
+        <div class="skills-grid">
+          <span class="skill-item">Python</span>
+          <span class="skill-item">Django</span>
+          <span class="skill-item">UNITY</span>
+          <span class="skill-item">REVIT</span>
+
+
+          <span class="skill-item">Blender</span>
+          <span class="skill-item">Three.js</span>
+          <span class="skill-item">ARCHICAD</span>
+          <span class="skill-item">LENSTUDIO</span>
+          <span class="skill-item">GODOT</span>
+          <span class="skill-item">Git</span>
+
+          <span class="skill-item">C++</span>
+          <span class="skill-item">C#</span>
+          <span class="skill-item">MySQL</span>
+          <span class="skill-item">Blockchain</span>
+          <span class="skill-item">Solidity</span>
+
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+      <div class="content-container">
+        <h2>Projects</h2>
+        
+        <div class="project-grid">
+          <div class="project-card">
+            <h3>AReState</h3>
+            <p>Blockchain-powered real estate platform with smart contracts, AR visualization of properties, and historical data stored on-chain.</p>
+            <div class="project-tech">
+              <span>React</span>
+              <span>Three.js</span>
+              <span>Solidity</span>
+              <span>IPFS</span>
+              <span>MetaMask</span>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <h3>ArchDo</h3>
+            <p>AR app for homeowners to visualize pipelines, electrical wires, and wall studs using mobile devices.</p>
+            <div class="project-tech">
+              <span>Unity</span>
+              <span>AR Foundation</span>
+              <span>Firebase</span>
+              <span>Python</span>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <h3>Cattle Classifier</h3>
+            <p>Trained a CNN to identify individual cattle for tracking and healthcare purposes.</p>
+            <div class="project-tech">
+              <span>Python</span>
+              <span>TensorFlow</span>
+              <span>Colab</span>
+              <span>Cattely Dataset</span>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <h3>OVVERULED</h3>
+            <p>Godot-based debate game where two players argue cases and an AI judge determines the winner based on arguments.</p>
+            <div class="project-tech">
+              <span>Godot</span>
+              <span>Python</span>
+              <span>JSON</span>
+              <span>AI Logic</span>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <h3>Fitto</h3>
+            <p>Tracks user workouts using wearables, offers token rewards, and lets trainers connect through AR.</p>
+            <div class="project-tech">
+              <span>React Native</span>
+              <span>Unity</span>
+              <span>Smart Contracts</span>
+              <span>OpenGL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="section">
+      <div class="content-container">
+        <h2>Experience</h2>
+        <div class="skyscraper-container">
+          <div class="skyscraper">
+            <div class="floor floor-3">
+              <div class="floor-content">
+                <h3>Lead – XR & Game Dev Initiatives</h3>
+                <p class="company">EngineeRoom</p>
+                <p class="date">Jan 2024 – Present</p>
+                <p class="description">Spearheading interactive XR and Game Development workshops, coordinating national-level tech events, and mentoring students in Unity, Unreal Engine, and Godot. Driving community engagement in immersive tech through hands-on learning experiences.</p>
+              </div>
+            </div>
+            <div class="floor floor-2">
+              <div class="floor-content">
+                <h3>Founder</h3>
+                <p class="company">ArchDo · Self-employed</p>
+                <p class="date">Sep 2024 – Present</p>
+                <p class="description">Building an AR-powered platform for real estate visualization and smart home diagnostics. Developed features for digital twin modeling, pipeline detection, and structural history logging using blockchain. Focused on product design, tech architecture, and user engagement.</p>
+              </div>
+            </div>
+            <div class="floor floor-1">
+              <div class="floor-content">
+                <h3>Intern</h3>
+                <p class="company">Embrizon Technologies · Internship</p>
+                <p class="date">Jun 2024 – Aug 2024</p>
+                <p class="description">Worked on AI model training pipelines for real-world image classification problems. Focused on dataset cleaning, model optimization, and deployment tasks using Python and cloud-based tools.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+      <div class="content-container">
+        <h2>Contact Me</h2>
+        <p>Interested in discussing tech innovation, architecture, or potential collaborations? Let's connect:</p>
+        
+        <div class="contact-info">
+          <div class="contact-item">
+            <span class="contact-label">Email:</span>
+            <a href="mailto:archdo.in@gmail.com">archdo.in@gmail.com</a>
+          </div>
+          
+          <div class="contact-item">
+            <span class="contact-label">LinkedIn:</span>
+            <a href="https://www.linkedin.com/in/yuvrajsharma03/" target="_blank">linkedin.com/in/yuvraj</a>
+          </div>
+        </div>
+        
+        <div class="resume-download">
+          <a href="#" class="btn-download">Download Resume</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Research Papers/Blogs Section -->
+    <section id="research" class="section">
+      <div class="section-content">
+        <h2 class="section-title">Research & Blogs</h2>
+        <div class="research-grid">
+          <div class="research-card">
+<section id="research">
+  <div class="container">
+    <h2>Research & Writing</h2>
+    <div class="research-grid">
+
+      
+            <div class="research-card">
+              <h3>MBTI Test for Paint: Mapping Personality Through Color</h3>
+              <p class="research-date">2023</p>
+              <p class="research-description">Explores how MBTI personality traits can influence color selection in spatial design. This experimental study merges psychology with visual expression to inspire more intuitive user-centered environments.</p>
+              <a href="#" class="research-link">Read More</a>
+            </div>
+      
+            <div class="research-card">
+              <h3>Bridging the Physical and Virtual: AR in Architectural Education</h3>
+              <p class="research-date">2023</p>
+              <p class="research-description">A research paper discussing the integration of augmented reality in design studios, highlighting its potential to revolutionize spatial understanding and collaborative critique in architecture schools.</p>
+              <a href="#" class="research-link">Read More</a>
+            </div>
+      
+            <div class="research-card">
+              <h3>Decentralized Futures: Web3 and the Built Environment</h3>
+              <p class="research-date">2024</p>
+              <p class="research-description">A blog post diving into how blockchain and Web3 could reshape architectural practice—think decentralized planning, tokenized design assets, and open-source urbanism.</p>
+              <a href="#" class="research-link">Read More</a>
+            </div>
+
+            <div class="research-card">
+              <h3>Text-to-Music Conversion Models</h3>
+              <p class="research-date">2025</p>
+              <p class="research-description"> The research aims to explore AI’s role in music generation based on natural language processing and sound recognition.</p>
+              <a href="#" class="research-link">Read More</a>
+            </div>
+
+            <div class="research-card">
+              <h3>Blog: ARCHIE: An Expert System of the Architects</h3>
+              <p class="research-date">2025</p>
+              <a href="#" class="research-link">Read More</a>
+            </div>
+      
+          </div>
+        </div>
+      </section>
+      
+
+  </div>
+  <script src="main.js"></script>
+<script>
+  // Smooth scrolling and section highlighting
+  document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.nav-menu a');
+    
+    // Function to update active nav link
+    function updateActiveNav() {
+      let current = '';
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (window.pageYOffset >= sectionTop - sectionHeight/3) {
+          current = section.getAttribute('id');
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').substring(1) === current) {
+          link.classList.add('active');
+        }
+      });
+    }
+    
+    // Smooth scroll for nav links
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetSection = document.getElementById(targetId);
+        
+        window.scrollTo({
+          top: targetSection.offsetTop,
+          behavior: 'smooth'
+        });
+      });
+    });
+    
+    // Update active nav on scroll
+    window.addEventListener('scroll', updateActiveNav);
+    
+    // Loading screen animation
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        gsap.to("#loading-screen", {
+          opacity: 0,
+          duration: 1.5,
+          onComplete: function() {
+            document.getElementById('loading-screen').style.display = 'none';
+            
+            // Intro animations
+            gsap.from(".intro-card", {
+              opacity: 0,
+              y: 50,
+              duration: 1.5,
+              ease: "power2.out"
+            });
+            
+            // Animate tech stack items
+            document.querySelectorAll('.tech-item').forEach(item => {
+              gsap.from(item, {
+                opacity: 0,
+                y: 20,
+                scale: 0.8,
+                duration: 0.5,
+                delay: parseInt(item.dataset.delay) / 1000,
+                ease: "back.out(1.7)"
+              });
+            });
+          }
+        });
+      }, 1500);
+    });
+  });
+</script>
+</body>
+</html>
+
+ 

@@ -7,7 +7,10 @@ import { gsap } from 'gsap';
 // Initialize renderer
 var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for better mobile performance
+
+// Detect if mobile device
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 // Attach to canvas container
 document.getElementById('canvas-container').appendChild(renderer.domElement);
@@ -26,7 +29,12 @@ function onWindowResize() {
 }
 
 var camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 500);
-camera.position.set(0, 10, 10);
+// Adjust camera position based on device
+if (isMobile) {
+  camera.position.set(0, 15, 15); // Move camera back on mobile for better view
+} else {
+  camera.position.set(0, 10, 10);
+}
 camera.lookAt(0, 0, 0);
 camera.up.set(0, 0, -1);
 
@@ -36,7 +44,7 @@ var smoke = new THREE.Object3D();
 var town = new THREE.Object3D();
 
 var createCarPos = true;
-var uSpeed = 0.5;
+var uSpeed = isMobile ? 0.2 : 0.5; // Slower rotation on mobile
 
 // Use a teal color like in the image (0x00e5e5)
 var setcolor = 0x00e5e5;
@@ -61,8 +69,11 @@ function getBuildingColor() {
 function init() {
   var segments = 2;
   
+  // Reduce number of buildings on mobile
+  var buildingCount = isMobile ? 60 : 120;
+  
   // Create buildings with better layout
-  for (var i = 1; i < 120; i++) {
+  for (var i = 1; i < buildingCount; i++) {
     // Vary building heights and shapes more dramatically
     var height = 0.8 + Math.abs(mathRandom(0.5));
     var width = 1 + mathRandom(0.5);
@@ -95,7 +106,7 @@ function init() {
     cube.add(wfloor);
     cube.castShadow = true;
     cube.receiveShadow = true;
-    cube.rotationValue = 0.1 + Math.abs(mathRandom(8));
+    cube.rotationValue = 0.1 + Math.abs(mathRandom(isMobile ? 4 : 8)); // Reduce rotation on mobile
 
     floor.scale.y = 0.05;
     
@@ -119,12 +130,14 @@ function init() {
     town.add(cube);
   }
 
-  // Atmospheric particles
-  var gmaterial = new THREE.MeshToonMaterial({color: 0xFFFF00, side: THREE.DoubleSide});
-  var gparticular = new THREE.CircleGeometry(0.01, 3);
-  var aparticular = 5;
+  // Reduce particles on mobile
+  var particleCount = isMobile ? 150 : 300;
+  for (var h = 1; h < particleCount; h++) {
+    // Atmospheric particles
+    var gmaterial = new THREE.MeshToonMaterial({color: 0xFFFF00, side: THREE.DoubleSide});
+    var gparticular = new THREE.CircleGeometry(0.01, 3);
+    var aparticular = 5;
 
-  for (var h = 1; h < 300; h++) {
     var particular = new THREE.Mesh(gparticular, gmaterial);
     particular.position.set(mathRandom(aparticular), mathRandom(aparticular), mathRandom(aparticular));
     particular.rotation.set(mathRandom(), mathRandom(), mathRandom());
@@ -178,9 +191,9 @@ window.addEventListener('mousemove', onMouseMove, false);
 window.addEventListener('touchstart', onDocumentTouchStart, false);
 window.addEventListener('touchmove', onDocumentTouchMove, false);
 
-// Enhanced lighting
-var ambientLight = new THREE.AmbientLight(0xFFFFFF, 4);
-var lightFront = new THREE.SpotLight(0xFFFFFF, 20, 10);
+// Adjust lighting for mobile
+var ambientLight = new THREE.AmbientLight(0xFFFFFF, isMobile ? 3 : 4);
+var lightFront = new THREE.SpotLight(0xFFFFFF, isMobile ? 15 : 20, 10);
 var lightBack = new THREE.PointLight(0xFFFFFF, 0.5);
 
 lightFront.rotation.x = 45 * Math.PI / 180;
@@ -251,8 +264,9 @@ var createCars = function(cScale = 2, cPos = 20, cColor = 0xFFFF00) {
   city.add(cElem);
 };
 
+// Reduce number of cars on mobile
 var generateLines = function() {
-  for (var i = 0; i < 60; i++) {
+  for (var i = 0; i < (isMobile ? 30 : 60); i++) {
     createCars(0.1, 20);
   }
 };
@@ -261,20 +275,25 @@ var generateLines = function() {
 init();
 generateLines();
 
-// Animation loop
+// Animation loop with mobile optimizations
 function animate() {
   requestAnimationFrame(animate);
   
-  // Slower, more controlled rotation
-  var rotationSpeed = uSpeed * 0.002;
+  // Slower rotation speed on mobile
+  var rotationSpeed = uSpeed * (isMobile ? 0.001 : 0.002);
   city.rotation.y += rotationSpeed;
   
-  // Minimal mouse movement effect
-  city.rotation.x += mouse.y * 0.0001;
-  city.rotation.z += mouse.x * 0.0001;
+  // Reduced mouse/touch movement effect on mobile
+  if (isMobile) {
+    city.rotation.x += mouse.y * 0.00005;
+    city.rotation.z += mouse.x * 0.00005;
+  } else {
+    city.rotation.x += mouse.y * 0.0001;
+    city.rotation.z += mouse.x * 0.0001;
+  }
   
-  // Very subtle bobbing motion
-  city.position.y = Math.sin(Date.now() * 0.001) * 0.01;
+  // Reduced bobbing motion on mobile
+  city.position.y = Math.sin(Date.now() * (isMobile ? 0.0005 : 0.001)) * (isMobile ? 0.005 : 0.01);
   
   renderer.render(scene, camera);
 }

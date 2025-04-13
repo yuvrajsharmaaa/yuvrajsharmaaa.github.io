@@ -33,9 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   var camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 500);
-  camera.position.set(0, 10, 10);
+  camera.position.set(0, 2, 14);
   camera.lookAt(0, 0, 0);
-  camera.up.set(0, 0, -1);
 
   var scene = new THREE.Scene();
   var city = new THREE.Object3D();
@@ -43,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var town = new THREE.Object3D();
 
   var createCarPos = true;
-  var uSpeed = 0.5;
+  var uSpeed = 0.001;
 
   // Use a teal color like in the image (0x00e5e5)
   var setcolor = 0x00e5e5;
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var segments = 2;
     
     // Create buildings with better layout
-    for (var i = 1; i < 120; i++) {
+    for (var i = 1; i < 100; i++) {
       // Vary building heights and shapes more dramatically
       var height = 0.8 + Math.abs(mathRandom(0.5));
       var width = 1 + mathRandom(0.5);
@@ -102,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
       cube.add(wfloor);
       cube.castShadow = true;
       cube.receiveShadow = true;
-      cube.rotationValue = 0.1 + Math.abs(mathRandom(8));
+      cube.rotationValue = 0.05 + Math.abs(mathRandom(4));
 
       floor.scale.y = 0.05;
       
@@ -111,8 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
       cube.scale.y = buildingHeight;
 
       // Better distribution of buildings in a grid pattern
-      var gridSize = 12;
-      var gridSpacing = 1.2;
+      var gridSize = 10;
+      var gridSpacing = 1.5;
       var row = Math.floor(i / gridSize) - Math.floor(gridSize / 2);
       var col = (i % gridSize) - Math.floor(gridSize / 2);
       
@@ -131,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var gparticular = new THREE.CircleGeometry(0.01, 3);
     var aparticular = 5;
 
-    for (var h = 1; h < 300; h++) {
+    for (var h = 1; h < 200; h++) {
       var particular = new THREE.Mesh(gparticular, gmaterial);
       particular.position.set(mathRandom(aparticular), mathRandom(aparticular), mathRandom(aparticular));
       particular.rotation.set(mathRandom(), mathRandom(), mathRandom());
@@ -186,8 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('touchmove', onDocumentTouchMove, false);
 
   // Enhanced lighting
-  var ambientLight = new THREE.AmbientLight(0xFFFFFF, 4);
-  var lightFront = new THREE.SpotLight(0xFFFFFF, 20, 10);
+  var ambientLight = new THREE.AmbientLight(0xFFFFFF, 2);
+  var lightFront = new THREE.SpotLight(0xFFFFFF, 15, 10);
   var lightBack = new THREE.PointLight(0xFFFFFF, 0.5);
 
   lightFront.rotation.x = 45 * Math.PI / 180;
@@ -201,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
   smoke.position.y = 2;
 
   // Added colored point lights for enhanced atmosphere
-  var tealLight = new THREE.PointLight(0x00ffff, 2, 12);
+  var tealLight = new THREE.PointLight(0x00ffff, 1, 12);
   tealLight.position.set(-5, 3, -5);
   scene.add(tealLight);
 
@@ -231,10 +230,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       gsap.to(cElem.position, {
         x: cPos, 
-        duration: 3, 
+        duration: 5,
         repeat: -1, 
         yoyo: true, 
-        delay: mathRandom(3)
+        delay: mathRandom(3),
+        ease: "power1.inOut"
       });
     } else {
       createCarPos = true;
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       gsap.to(cElem.position, {
         z: cPos, 
-        duration: 5, 
+        duration: 7,
         repeat: -1, 
         yoyo: true, 
         delay: mathRandom(3),
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   var generateLines = function() {
-    for (var i = 0; i < 60; i++) {
+    for (var i = 0; i < 30; i++) {
       createCars(0.1, 20);
     }
   };
@@ -272,22 +272,22 @@ document.addEventListener('DOMContentLoaded', function() {
   function animate() {
     requestAnimationFrame(animate);
     
-    // Rotate buildings
+    // Slower rotation for buildings
     city.children.forEach((child) => {
       if (child.rotationValue) {
-        child.rotation.y += (child.rotationValue / 1000);
+        child.rotation.y += (child.rotationValue / 2000);
       }
     });
 
-    // Animate smoke particles
+    // Slower smoke particle animation
     smoke.children.forEach((child) => {
-      child.rotation.z += 0.001;
+      child.rotation.z += 0.0005;
     });
 
-    // Camera movement based on mouse position
+    // Smoother camera movement
     if (mouse.x !== undefined && mouse.y !== undefined) {
-      camera.position.x += (mouse.x - camera.position.x) * 0.05;
-      camera.position.y += (-(mouse.y) - camera.position.y) * 0.05;
+      camera.position.x += (mouse.x * 2 - camera.position.x) * 0.02;
+      camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.02;
       camera.lookAt(scene.position);
     }
 

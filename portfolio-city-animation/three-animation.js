@@ -4,16 +4,31 @@ import { gsap } from 'gsap';
 
 // Main.js - Fixed to work with CDN imports
 
-// Initialize renderer
-var renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+// Initialize renderer with proper settings
+var renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: true,
+  powerPreference: "high-performance"
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for better mobile performance
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // Detect if mobile device
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-// Attach to canvas container
-document.getElementById('canvas-container').appendChild(renderer.domElement);
+// Get canvas container
+var container = document.getElementById('canvas-container');
+if (!container) {
+  console.error('Canvas container not found!');
+} else {
+  // Clear any existing canvas
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  container.appendChild(renderer.domElement);
+}
 
 if (window.innerWidth > 800) {
   renderer.shadowMap.enabled = true;
@@ -31,7 +46,7 @@ function onWindowResize() {
 var camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 500);
 // Adjust camera position based on device
 if (isMobile) {
-  camera.position.set(0, 15, 15); // Move camera back on mobile for better view
+  camera.position.set(0, 15, 20); // Move camera further back on mobile
 } else {
   camera.position.set(0, 10, 10);
 }
@@ -44,13 +59,13 @@ var smoke = new THREE.Object3D();
 var town = new THREE.Object3D();
 
 var createCarPos = true;
-var uSpeed = isMobile ? 0.2 : 0.5; // Slower rotation on mobile
+var uSpeed = isMobile ? 0.1 : 0.5; // Slower rotation on mobile
 
 // Use a teal color like in the image (0x00e5e5)
 var setcolor = 0x00e5e5;
 
-scene.background = new THREE.Color(setcolor);
-scene.fog = new THREE.Fog(setcolor, 10, 16);
+scene.background = new THREE.Color(0x001F2E);
+scene.fog = new THREE.Fog(0x001F2E, 10, 16);
 
 function mathRandom(num = 0) {
   var numValue = -Math.random() * num + Math.random() * num;
@@ -70,7 +85,7 @@ function init() {
   var segments = 2;
   
   // Reduce number of buildings on mobile
-  var buildingCount = isMobile ? 60 : 120;
+  var buildingCount = isMobile ? 40 : 120;
   
   // Create buildings with better layout
   for (var i = 1; i < buildingCount; i++) {
@@ -131,7 +146,7 @@ function init() {
   }
 
   // Reduce particles on mobile
-  var particleCount = isMobile ? 150 : 300;
+  var particleCount = isMobile ? 100 : 300;
   for (var h = 1; h < particleCount; h++) {
     // Atmospheric particles
     var gmaterial = new THREE.MeshToonMaterial({color: 0xFFFF00, side: THREE.DoubleSide});
@@ -271,31 +286,39 @@ var generateLines = function() {
   }
 };
 
-// Initialize the scene
-init();
-generateLines();
-
-// Animation loop with mobile optimizations
+// Animation loop
 function animate() {
   requestAnimationFrame(animate);
   
-  // Slower rotation speed on mobile
-  var rotationSpeed = uSpeed * (isMobile ? 0.001 : 0.002);
-  city.rotation.y += rotationSpeed;
-  
-  // Reduced mouse/touch movement effect on mobile
-  if (isMobile) {
-    city.rotation.x += mouse.y * 0.00005;
-    city.rotation.z += mouse.x * 0.00005;
-  } else {
-    city.rotation.x += mouse.y * 0.0001;
-    city.rotation.z += mouse.x * 0.0001;
+  // Ensure city exists before animating
+  if (city) {
+    var rotationSpeed = uSpeed * (isMobile ? 0.0005 : 0.002);
+    city.rotation.y += rotationSpeed;
+    
+    if (isMobile) {
+      city.rotation.x += mouse.y * 0.00002;
+      city.rotation.z += mouse.x * 0.00002;
+    } else {
+      city.rotation.x += mouse.y * 0.0001;
+      city.rotation.z += mouse.x * 0.0001;
+    }
+    
+    city.position.y = Math.sin(Date.now() * (isMobile ? 0.0002 : 0.001)) * (isMobile ? 0.002 : 0.01);
   }
-  
-  // Reduced bobbing motion on mobile
-  city.position.y = Math.sin(Date.now() * (isMobile ? 0.0005 : 0.001)) * (isMobile ? 0.005 : 0.01);
   
   renderer.render(scene, camera);
 }
 
-animate(); 
+// Initialize and start animation
+window.addEventListener('load', function() {
+  init();
+  generateLines();
+  animate();
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}, false); 
